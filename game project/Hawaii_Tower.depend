@@ -1,0 +1,32 @@
+# depslib dependency file v1.0
+1419318992 source:c:\users\user\desktop\hawaii_tower\audio.c
+	"audio.h"
+
+1260885116 c:\users\user\desktop\hawaii_tower\audio.h
+	<windows.h>
+	<mmsystem.h>
+	<stdio.h>
+	<stdlib.h>
+
+1231335102 source:c:\users\user\desktop\hawaii_tower\console_draw2.c
+	"console_draw2.h"
+
+1418709396 c:\users\user\desktop\hawaii_tower\console_draw2.h
+	<windows.h>
+
+1197485698 source:c:\users\user\desktop\hawaii_tower\kb_input2.c
+	"kb_input2.h"
+
+1197486290 c:\users\user\desktop\hawaii_tower\kb_input2.h
+	<windows.h>
+
+1421639187 source:c:\users\user\desktop\hawaii_tower\main.c
+	"audio.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<windows.h>
+	<mmsystem.h>
+	"console_draw2.h"
+	"kb_input2.h"
+

@@ -1,0 +1,1168 @@
+//Case Q go back to menu
+#include "audio.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+#include <mmsystem.h>
+#include "console_draw2.h"
+#include "kb_input2.h"
+
+#define LENGTH 4
+#define WIDTH 4
+#define XO 3
+#define YO 4
+#define XOO 7
+#define YOO 8
+
+typedef struct _image {
+    int row;
+    int col;
+    char *pixel;
+    int *color;
+    int xp;
+    int yp;
+    int disk_color;
+    int bg_color;
+    struct Image* up;
+    struct Image* down;
+    int size;
+} Image;
+
+typedef struct _font {
+    int height;
+    int width;
+    char *pixel;
+} Font;
+//
+
+//Image function
+Image * read_image(char *pixel_file, char *color_file);
+void show_image(Image *ip, int offx, int offy);
+void destroy_image(Image *ip);
+char getpixel(Image *ip, int x, int y);
+int getcolor(Image *ip, int x, int y);
+void show_image2(Image *ip);
+
+//String function
+void putStringLarge(Font *fp, int x, int y, char *p, int fg_color, int bg_color);
+Font * read_font(char *pixel_file);
+void show_font(Font *ip, char letter, int offx, int offy, int fg_color, int bg_color);
+void destroy_font(Font *ip);
+void putString(int x, int y, char *p, int fg_color, int bg_color);
+
+void show_map2(int a,int b, int c, int d, int e, int f, int base, int width, int height);
+void show_map(int length, int width);
+void warn_string(int mod_px, char *s){
+    putString(60+mod_px,5,s,4,11);
+
+}
+void show_plain_bg(){
+    int i,j,color = 11;
+    char*p = ".";
+    for(i = 0; i< 170;i++){
+        for(j = 0; j< 20;j++){
+            putString(i,j,p,color,color);
+
+        }for(j = 20; j< 60;j++){
+            putString(i,j,p,color,color);
+
+        }
+    }
+}
+
+int main(void){
+    int i,j;
+    Audio audio[1];
+    openAudioFile("bgmusic.wmv", &audio[0]);
+    int a_p = 15, b_p = 42, c_p = 69, d_p = 96, e_p = 123, f_p = 150;
+    initializeKeyInput();
+    Image null_image;
+    null_image.up = NULL;
+    null_image.down = NULL;
+    null_image.size = -1;
+    null_image.disk_color = -1;
+    Image *bg = read_image("bg.pixel","newnewbg.color");
+    Image *A = read_image("d3.pixel","d3.color");
+    Image *B = read_image("d0.pixel","d0.color");
+    Image *C = read_image("d1.pixel","d1.color");
+    Image *D = read_image("d0.pixel","d0.color");
+    Image *E = read_image("d1.pixel","d1.color");
+    Image *F = read_image("d2.pixel","d2.color");
+    Image *G = read_image("d3.pixel","d3.color");
+    Image *H = read_image("d0.pixel","d0.color");
+    Image *I = read_image("d1.pixel","d1.color");
+    Image *J = read_image("d2.pixel","d2.color");
+    Image *K = read_image("d3.pixel","d3.color");
+    Image *L = read_image("d2.pixel","d2.color");
+    Image *M = read_image("d1.pixel","d1.color");
+    Image *N = read_image("d0.pixel","d0.color");
+    Image *O = read_image("d3.pixel","d3.color");
+    Image *P = read_image("d2.pixel","d2.color");
+    // set defaults
+    //COLOR CODES (DISK_COLOR, BG_COLOR)
+    //YELLOW: 6, 14
+    //BLUE: 10, 2
+    //RED: 11, 9
+    //GREEN: 4, 12
+    A->disk_color = 10;
+    A->bg_color = 2;
+    B->disk_color = 11;
+    B->bg_color = 9;
+    C->disk_color = 11;
+    C->bg_color = 9;
+    D->disk_color = 4;
+    D->bg_color = 12;
+    E->disk_color = 10;
+    E->bg_color = 2;
+    F->disk_color = 10;
+    F->bg_color = 2;
+    G->disk_color = 11;
+    G->bg_color = 9;
+    H->disk_color = 10;
+    H->bg_color = 2;
+    I->disk_color = 6;
+    I->bg_color = 14;
+    J->disk_color = 6;
+    J->bg_color = 14;
+    K->disk_color = 4;
+    K->bg_color = 12;
+    L->disk_color = 4;
+    L->bg_color = 12;
+    M->disk_color = 4;
+    M->bg_color = 12;
+    N->disk_color = 6;
+    N->bg_color = 14;
+    O->disk_color = 6;
+    O->bg_color = 14;
+    P->disk_color = 11;
+    P->bg_color = 9;
+
+
+    A->size = 3;
+    B->size = 0;
+    C->size = 1;
+    D->size = 0;
+    E->size = 1;
+    F->size = 2;
+    G->size = 3;
+    H->size = 0;
+    I->size = 1;
+    J->size = 2;
+    K->size = 3;
+    L->size = 2;
+    M->size = 1;
+    N->size = 0;
+    O->size = 3;
+    P->size = 2;
+
+    A->xp = a_p-4;
+    A->yp = 34;
+    B->xp = a_p-1;
+    B->yp = 36;
+    C->xp = a_p-2;
+    C->yp = 38;
+    D->xp = b_p-1;
+    D->yp = 36;
+    E->xp = b_p-2;
+    E->yp = 38;
+    F->xp = c_p-3;
+    F->yp = 34;
+    G->xp = c_p-4;
+    G->yp = 36;
+    H->xp = c_p-1;
+    H->yp = 38;
+    I->xp = d_p-2;
+    I->yp = 34;
+    J->xp = d_p-3;
+    J->yp = 36;
+    K->xp = d_p-4;
+    K->yp = 38;
+    L->xp = e_p-3;
+    L->yp = 36;
+    M->xp = e_p-2;
+    M->yp = 38;
+    N->xp = f_p-1;
+    N->yp = 34;
+    O->xp = f_p-4;
+    O->yp = 36;
+    P->xp = f_p-3;
+    P->yp = 38;
+
+    A->up = NULL;
+    A->down = B;
+    B->up = A;
+    B->down = C;
+    C->up = B;
+    C->down = NULL;
+    D->up = NULL;
+    D->down = E;
+    E->up = D;
+    E->down = NULL;
+    F->up = NULL;
+    F->down = G;
+    G->up = F;
+    G->down = H;
+    H->up = G;
+    H->down = NULL;
+    I->up = NULL;
+    I->down = J;
+    J->up = I;
+    J->down = K;
+    K->up = J;
+    K->down = NULL;
+    L->up = NULL;
+    L->down = M;
+    M->up = L;
+    M->down = NULL;
+    N->up = NULL;
+    N->down = O;
+    O->up = N;
+    O->down = P;
+    P->up = O;
+    P->down = NULL;
+
+    Image* top_1 = A;
+    Image* top_2 = D;
+    Image* top_3 = F;
+    Image* top_4 = I;
+    Image* top_5 = L;
+    Image* top_6 = N;
+    //~ set defaults
+
+
+
+
+    int key_down[10] = {0};
+    int key_val[10] = {VK_1, VK_2, VK_3, VK_4, VK_5, VK_6, VK_LEFT,VK_RIGHT, VK_SPACE, VK_Q};
+    int k;
+
+    int something_up = 0;
+    Image* use_ip;
+    Image* ipdc;
+    Image* selected = NULL;
+    int rod_num = 0;
+    int board;
+    int original;
+    while(1){
+        clearScreen();
+        show_plain_bg();
+        show_map2(a_p,b_p,c_p,d_p,e_p,f_p,40,20,15);
+        show_image2(A);
+        show_image2(B);
+        show_image2(C);
+        show_image2(D);
+        show_image2(E);
+        show_image2(F);
+        show_image2(G);
+        show_image2(H);
+        show_image2(I);
+        show_image2(J);
+        show_image2(K);
+        show_image2(L);
+        show_image2(M);
+        show_image2(N);
+        show_image2(O);
+        show_image2(P);
+
+        drawCmdWindow();
+
+        for(k = 0;k<10;k++){
+        if(KEY_DOWN(key_val[k])&&!key_down[k]){
+            key_down[k] = 1;
+            switch(key_val[k]){
+                case VK_1:
+                    if(something_up == 1){
+                        warn_string(-4,"You have to place the disk back to choose another one!!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+                    }
+                    if(top_1 == NULL) {
+                        warn_string(-4,"Oh~No~! There's nothing on Rod 1!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+
+                    }
+                    something_up = 1;
+                    use_ip = top_1;
+                    original = 1;
+
+                    if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                    else ipdc = &null_image;
+
+                    rod_num = 1;
+                    for(i = 0; i < 25;i++){
+                        use_ip = top_1;
+                        for(j = 0; j< 10;j++){
+                            if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                            use_ip->yp--;
+                            if(ipdc->disk_color != use_ip->disk_color) break;
+                            if(ipdc->size != use_ip->size + 1) break;
+                            if(use_ip->down == NULL) break;
+                            use_ip = use_ip->down;
+                        }
+
+                        clearScreen();
+                        show_plain_bg();
+                        show_map2(a_p,b_p,c_p,d_p,e_p,f_p,40,20,15);
+                        show_image2(A);
+                        show_image2(B);
+                        show_image2(C);
+                        show_image2(D);
+                        show_image2(E);
+                        show_image2(F);
+                        show_image2(G);
+                        show_image2(H);
+                        show_image2(I);
+                        show_image2(J);
+                        show_image2(K);
+                        show_image2(L);
+                        show_image2(M);
+                        show_image2(N);
+                        show_image2(O);
+                        show_image2(P);
+                        drawCmdWindow();
+                        Sleep(15);
+                    }
+                    if(use_ip->down != NULL){
+                            ipdc = use_ip->down;
+                            ipdc->up = NULL;
+
+                    }else top_1 = NULL;
+                    selected = use_ip;
+                    top_1 = use_ip->down;
+                    break;
+                case VK_2:
+                    if(something_up == 1){
+                        warn_string(-4,"You have to place the disk back to choose another one!!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+                    }
+                    if(top_2 == NULL) {
+                        warn_string(-4,"Oh~No~! There's nothing on Rod 2!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+
+                    }
+                    something_up = 1;
+                    use_ip = top_2;
+                    original = 2;
+
+                    if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                    else ipdc = use_ip;
+
+                    rod_num = 2;
+                    for(i = 0; i < 25;i++){
+                        use_ip = top_2;
+                        for(j = 0; j< 10;j++){
+                            if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                            use_ip->yp--;
+                            if(ipdc->disk_color != use_ip->disk_color) break;
+                            if(ipdc->size != use_ip->size + 1) break;
+                            if(use_ip->down == NULL) break;
+                            use_ip = use_ip->down;
+                        }
+                        clearScreen();
+                        show_plain_bg();
+                        show_map2(a_p,b_p,c_p,d_p,e_p,f_p,40,20,15);
+                        show_image2(A);
+                        show_image2(B);
+                        show_image2(C);
+                        show_image2(D);
+                        show_image2(E);
+                        show_image2(F);
+                        show_image2(G);
+                        show_image2(H);
+                        show_image2(I);
+                        show_image2(J);
+                        show_image2(K);
+                        show_image2(L);
+                        show_image2(M);
+                        show_image2(N);
+                        show_image2(O);
+                        show_image2(P);
+                        drawCmdWindow();
+                        Sleep(15);
+                    }
+                    if(use_ip->down != NULL){
+                            ipdc = use_ip->down;
+                            ipdc->up = NULL;
+
+                    }else top_2 = NULL;
+                    selected = use_ip;
+                    top_2 = use_ip->down;
+                    break;
+                case VK_3:
+                    if(something_up == 1){
+                        warn_string(-4,"You have to place the disk back to choose another one!!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+                    }
+                    if(top_3 == NULL) {
+                        warn_string(-4,"Oh~No~! There's nothing on Rod 3!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+
+                    }
+                    something_up = 1;
+                    original = 3;
+                    use_ip = top_3;
+
+                    if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                    else ipdc = use_ip;
+
+                    rod_num = 3;
+                    for(i = 0; i < 25;i++){
+                        use_ip = top_3;
+                        for(j = 0; j< 10;j++){
+                            if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                            use_ip->yp--;
+                            if(ipdc->disk_color != use_ip->disk_color) break;
+                            if(ipdc->size != use_ip->size + 1) break;
+                            if(use_ip->down == NULL) break;
+                            use_ip = use_ip->down;
+                        }
+                        clearScreen();
+                        show_plain_bg();
+                        show_map2(a_p,b_p,c_p,d_p,e_p,f_p,40,20,15);
+                        show_image2(A);
+                        show_image2(B);
+                        show_image2(C);
+                        show_image2(D);
+                        show_image2(E);
+                        show_image2(F);
+                        show_image2(G);
+                        show_image2(H);
+                        show_image2(I);
+                        show_image2(J);
+                        show_image2(K);
+                        show_image2(L);
+                        show_image2(M);
+                        show_image2(N);
+                        show_image2(O);
+                        show_image2(P);
+                        drawCmdWindow();
+                        Sleep(15);
+                    }
+                    if(use_ip->down != NULL){
+                            ipdc = use_ip->down;
+                            ipdc->up = NULL;
+
+                    }else top_3 = NULL;
+                    selected = use_ip;
+                    top_3 = use_ip->down;
+                    break;
+                case VK_4:
+                    if(something_up == 1){
+                        warn_string(-4,"You have to place the disk back to choose another one!!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+                    }
+                    if(top_4 == NULL) {
+                        warn_string(-4,"Oh~No~! There's nothing on Rod 4!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+
+                    }
+                    something_up = 1;
+                    use_ip = top_4;
+                    original = 4;
+
+                    if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                    else ipdc = use_ip;
+
+                    rod_num = 4;
+                    for(i = 0; i < 25;i++){
+                        use_ip = top_4;
+                        for(j = 0; j< 10;j++){
+                            if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                            use_ip->yp--;
+                            if(ipdc->disk_color != use_ip->disk_color) break;
+                            if(ipdc->size != use_ip->size + 1) break;
+                            if(use_ip->down == NULL) break;
+                            use_ip = use_ip->down;
+                        }
+                        clearScreen();
+                        show_plain_bg();
+                        show_map2(a_p,b_p,c_p,d_p,e_p,f_p,40,20,15);
+                        show_image2(A);
+                        show_image2(B);
+                        show_image2(C);
+                        show_image2(D);
+                        show_image2(E);
+                        show_image2(F);
+                        show_image2(G);
+                        show_image2(H);
+                        show_image2(I);
+                        show_image2(J);
+                        show_image2(K);
+                        show_image2(L);
+                        show_image2(M);
+                        show_image2(N);
+                        show_image2(O);
+                        show_image2(P);
+                        drawCmdWindow();
+                        Sleep(15);
+                    }
+                    if(use_ip->down != NULL){
+                            ipdc = use_ip->down;
+                            ipdc->up = NULL;
+
+                    }else top_4 = NULL;
+                    selected = use_ip;
+                    top_4 = use_ip->down;
+                    break;
+                case VK_5:
+                    if(something_up == 1){
+                        warn_string(-4,"You have to place the disk back to choose another one!!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+                    }
+                    if(top_5 == NULL) {
+                        warn_string(-4,"Oh~No~! There's nothing on Rod 5!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+
+                    }
+                    something_up = 1;
+                    use_ip = top_5;
+                    original = 5;
+
+                    if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                    else ipdc = use_ip;
+
+                    rod_num = 5;
+                    for(i = 0; i < 25;i++){
+                        use_ip = top_5;
+                        for(j = 0; j< 10;j++){
+                            if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                            use_ip->yp--;
+                            if(ipdc->disk_color != use_ip->disk_color) break;
+                            if(ipdc->size != use_ip->size + 1) break;
+                            if(use_ip->down == NULL) break;
+                            use_ip = use_ip->down;
+                        }
+                        clearScreen();
+                        show_plain_bg();
+                        show_map2(a_p,b_p,c_p,d_p,e_p,f_p,40,20,15);
+                        show_image2(A);
+                        show_image2(B);
+                        show_image2(C);
+                        show_image2(D);
+                        show_image2(E);
+                        show_image2(F);
+                        show_image2(G);
+                        show_image2(H);
+                        show_image2(I);
+                        show_image2(J);
+                        show_image2(K);
+                        show_image2(L);
+                        show_image2(M);
+                        show_image2(N);
+                        show_image2(O);
+                        show_image2(P);
+                        drawCmdWindow();
+                        Sleep(15);
+                    }
+                    if(use_ip->down != NULL){
+                            ipdc = use_ip->down;
+                            ipdc->up = NULL;
+
+                    }else top_5 = NULL;
+                    selected = use_ip;
+                    top_5 = use_ip->down;
+                    break;
+                case VK_6:
+                    if(something_up == 1){
+                        warn_string(-4,"You have to place the disk back to choose another one!!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+                    }
+                    if(top_6 == NULL) {
+                        warn_string(-4,"Oh~No~! There's nothing on Rod 6!");
+                        drawCmdWindow();
+                        Sleep(2000);
+                        break;
+
+                    }
+                    something_up = 1;
+                    use_ip = top_6;
+                    original = 6;
+
+                    if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                    else ipdc = use_ip;
+
+                    rod_num = 6;
+                    for(i = 0; i < 25;i++){
+                        use_ip = top_6;
+                        for(j = 0; j< 10;j++){
+                            if(use_ip->down!=NULL)ipdc = (use_ip->down);
+                            use_ip->yp--;
+                            if(ipdc->disk_color != use_ip->disk_color) break;
+                            if(ipdc->size != use_ip->size + 1) break;
+                            if(use_ip->down == NULL) break;
+                            use_ip = use_ip->down;
+                        }
+                        clearScreen();
+                        show_plain_bg();
+                        show_map2(a_p,b_p,c_p,d_p,e_p,f_p,40,20,15);
+                        show_image2(A);
+                        show_image2(B);
+                        show_image2(C);
+                        show_image2(D);
+                        show_image2(E);
+                        show_image2(F);
+                        show_image2(G);
+                        show_image2(H);
+                        show_image2(I);
+                        show_image2(J);
+                        show_image2(K);
+                        show_image2(L);
+                        show_image2(M);
+                        show_image2(N);
+                        show_image2(O);
+                        show_image2(P);
+                        drawCmdWindow();
+                        Sleep(15);
+                    }
+                    if(use_ip->down != NULL){
+                            ipdc = use_ip->down;
+                            ipdc->up = NULL;
+
+                    }else top_6 = NULL;
+                    selected = use_ip;
+                    top_6 = use_ip->down;
+                    break;
+
+                case VK_RIGHT:
+                    if(selected == NULL) break;
+                    if(selected->xp > 150-27) break;
+                    rod_num++;
+                    use_ip = selected;
+                    for(i = 0; i< 27; i++){
+                        use_ip = selected;
+                        for(j = 0; j< 10; j++){
+                            use_ip->xp++;
+                            if(use_ip->up != NULL)use_ip = use_ip->up;
+                            else break;
+                        }
+                        clearScreen();
+                        show_plain_bg();
+                        show_map2(a_p,b_p,c_p,d_p,e_p,f_p,40,20,15);
+                        show_image2(A);
+                        show_image2(B);
+                        show_image2(C);
+                        show_image2(D);
+                        show_image2(E);
+                        show_image2(F);
+                        show_image2(G);
+                        show_image2(H);
+                        show_image2(I);
+                        show_image2(J);
+                        show_image2(K);
+                        show_image2(L);
+                        show_image2(M);
+                        show_image2(N);
+                        show_image2(O);
+                        show_image2(P);
+                        drawCmdWindow();
+                        Sleep(1);
+
+                    }
+                    break;
+                case VK_LEFT:
+                    if(selected == NULL){
+                        break;
+                    }
+                    if(selected->xp < 16) break;
+                    use_ip = selected;
+                    rod_num--;
+                    for(i = 0; i< 27; i++){
+                        use_ip = selected;
+                        for(j = 0; j< 10; j++){
+                            use_ip->xp--;
+                            if(use_ip->up != NULL)use_ip = use_ip->up;
+                            else break;
+                        }
+                        clearScreen();
+                        show_plain_bg();
+                        show_map2(a_p,b_p,c_p,d_p,e_p,f_p,40,20,15);
+                        show_image2(A);
+                        show_image2(B);
+                        show_image2(C);
+                        show_image2(D);
+                        show_image2(E);
+                        show_image2(F);
+                        show_image2(G);
+                        show_image2(H);
+                        show_image2(I);
+                        show_image2(J);
+                        show_image2(K);
+                        show_image2(L);
+                        show_image2(M);
+                        show_image2(N);
+                        show_image2(O);
+                        show_image2(P);
+                        drawCmdWindow();
+                        Sleep(1);
+                    }
+                    break;
+                case VK_SPACE:
+                    if(something_up == 0) break;
+                    switch(rod_num){
+                        case 1:
+                            use_ip = top_1;
+                            if(top_1 != NULL){
+                                top_1->up = selected;
+                                board = top_1->yp;
+                            }
+                            break;
+                        case 2:
+                            use_ip = top_2;
+                            if(top_2 != NULL){
+                                top_2->up = selected;
+                                board = top_2->yp;
+                            }
+                            break;
+                        case 3:
+                            use_ip = top_3;
+                            if(top_3 != NULL){
+                                top_3->up = selected;
+                                board = top_3->yp;
+                            }
+                            break;
+                        case 4:
+                            use_ip = top_4;
+                            if(top_4 != NULL){
+                                top_4->up = selected;
+                                board = top_4->yp;
+                            }
+                            break;
+                        case 5:
+                            use_ip = top_5;
+                            if(top_5 != NULL){
+                                top_5->up = selected;
+                                board = top_5->yp;
+                            }
+                            break;
+                        case 6:
+                            use_ip = top_6;
+                            if(top_6 != NULL){
+                                top_6->up = selected;
+                                board = top_6->yp;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    if(use_ip!= NULL && rod_num != original){
+                        if(selected->disk_color != use_ip->disk_color) break;
+                        if(selected->size > use_ip->size) break;
+                    }else if (rod_num == original){
+                        ;
+                    }else{
+                        board = 40;
+                    }
+                    //
+                    use_ip = selected;
+                    int count_num_in = 20;
+                    for(i = 0; selected->yp < board-2; i++){
+                        use_ip = selected;
+                        for(j = 0; j< 10; j++){
+                            use_ip->yp++;
+                            if(use_ip->up != NULL)use_ip = use_ip->up;
+                            else break;
+                        }
+                        clearScreen();
+                        show_plain_bg();
+                        show_map2(a_p,b_p,c_p,d_p,e_p,f_p,40,20,15);
+                        show_image2(A);
+                        show_image2(B);
+                        show_image2(C);
+                        show_image2(D);
+                        show_image2(E);
+                        show_image2(F);
+                        show_image2(G);
+                        show_image2(H);
+                        show_image2(I);
+                        show_image2(J);
+                        show_image2(K);
+                        show_image2(L);
+                        show_image2(M);
+                        show_image2(N);
+                        show_image2(O);
+                        show_image2(P);
+                        drawCmdWindow();
+                        Sleep(8);
+                    }
+                    switch(rod_num){
+                        case 1:
+                            selected->down = top_1;
+                            top_1 = use_ip;
+                            break;
+                        case 2:
+                            selected->down = top_2;
+                            top_2 = use_ip;
+                            break;
+                        case 3:
+                            selected->down = top_3;
+                            top_3 = use_ip;
+                            break;
+                        case 4:
+                            selected->down = top_4;
+                            top_4 = use_ip;
+                            break;
+                        case 5:
+                            selected->down = top_5;
+                            top_5 = use_ip;
+                            break;
+                        case 6:
+                            selected->down = top_6;
+                            top_6 = use_ip;
+                            break;
+                        default:
+                            break;
+                    }
+                    selected = NULL;
+                    something_up = 0;
+                    int lose = 0;
+                    //check if it wins
+                    if(top_1!=NULL) {
+                        use_ip = top_1;
+                        for(i = 0; i< 10;i++){
+                            if(use_ip->down !=NULL) ipdc = use_ip ->down;
+                            else break;
+                            if(use_ip->disk_color!=ipdc->disk_color) lose++;
+                            else if(use_ip->size != ipdc->size-1) lose++;
+                            use_ip = use_ip->down;
+                        }
+                        if(lose != 0) break;
+
+                    }
+                    if(top_2!=NULL) {
+                        use_ip = top_2;
+                        for(i = 0; i< 10;i++){
+                            if(use_ip->down !=NULL) ipdc = use_ip ->down;
+                            else break;
+                            if(use_ip->disk_color!=ipdc->disk_color) lose++;
+                            else if(use_ip->size != ipdc->size-1) lose++;
+                            use_ip = use_ip->down;
+                        }
+                        if(lose != 0) break;
+
+                    }
+                    if(top_3!=NULL) {
+                        use_ip = top_3;
+                        for(i = 0; i< 10;i++){
+                            if(use_ip->down !=NULL) ipdc = use_ip ->down;
+                            else break;
+                            if(use_ip->disk_color!=ipdc->disk_color) lose++;
+                            else if(use_ip->size != ipdc->size-1) lose++;
+                            use_ip = use_ip->down;
+                        }
+                        if(lose != 0) break;
+
+                    }
+                    if(top_4!=NULL) {
+                        use_ip = top_4;
+                        for(i = 0; i< 10;i++){
+                            if(use_ip->down !=NULL) ipdc = use_ip ->down;
+                            else break;
+                            if(use_ip->disk_color!=ipdc->disk_color) lose++;
+                            else if(use_ip->size != ipdc->size-1) lose++;
+                            use_ip = use_ip->down;
+                        }
+                        if(lose != 0) break;
+
+                    }
+                    if(top_5!=NULL) {
+                        use_ip = top_5;
+                        for(i = 0; i< 10;i++){
+                            if(use_ip->down !=NULL) ipdc = use_ip ->down;
+                            else break;
+                            if(use_ip->disk_color!=ipdc->disk_color) lose++;
+                            else if(use_ip->size != ipdc->size-1) lose++;
+                            use_ip = use_ip->down;
+                        }
+                        if(lose != 0) break;
+
+                    }
+                    if(top_6!=NULL) {
+                        use_ip = top_6;
+                        for(i = 0; i< 10;i++){
+                            if(use_ip->down !=NULL) ipdc = use_ip ->down;
+                            else break;
+                            if(use_ip->disk_color!=ipdc->disk_color) lose++;
+                            else if(use_ip->size != ipdc->size-1) lose++;
+                            use_ip = use_ip->down;
+                        }
+                        if(lose != 0) break;
+
+                    }
+                    return 222;// win!!
+                case VK_Q:
+                    return 0;//back to menu!!
+                    break;
+                default:
+                    break;
+
+
+            }
+        }
+        if(KEY_UP(key_val[k])&&key_down[k]){
+            key_down[k] = 0;
+        }
+
+        drawCmdWindow();
+    }
+   }
+    return 0;
+}
+
+
+void show_map2(int a,int b, int c, int d, int e, int f, int base, int width, int height){
+    int i;
+    int w = width/2;
+    int color = 15;//color = 15 white
+    for(i = -w; i<w; i++){
+        putString(a+i,base,"0",color,color);
+    }
+    for(i = -w; i<w; i++){
+        putString(b+i,base,"0",color,color);
+    }
+    for(i = -w; i<w; i++){
+        putString(c+i,base,"0",color,color);
+    }
+    for(i = -w; i<w; i++){
+        putString(d+i,base,"0",color,color);
+    }
+    for(i = -w; i<w; i++){
+        putString(e+i,base,"0",color,color);
+    }
+    for(i = -w; i<w; i++){
+        putString(f+i,base,"0",color,color);
+    }
+    for(i = 0; i<height; i++){
+        putString(a,base-i,"0",color,color);
+    }
+    for(i = 0; i<height; i++){
+        putString(b,base-i,"0",color,color);
+    }
+    for(i = 0; i<height; i++){
+        putString(c,base-i,"0",color,color);
+    }
+    for(i = 0; i<height; i++){
+        putString(d,base-i,"0",color,color);
+    }
+    for(i = 0; i<height; i++){
+        putString(e,base-i,"0",color,color);
+    }
+    for(i = 0; i<height; i++){
+        putString(f,base-i,"0",color,color);
+    }
+}
+
+void show_map(int length, int width){
+    int i, j;
+    int x = XO;
+    int y = YO;
+    for(i = 0; i< LENGTH; i++){
+        for(j = 0 ; j < width*WIDTH; j++){
+            putString(x+i,y+j,"0",15,15);
+
+        }
+
+    }
+    for(i = LENGTH; i<(length-1)*LENGTH; i++){
+        for(j = 0 ; j < 1*WIDTH; j++){
+            putString(x+i,y+j,"0",15,15);
+
+        }
+        for(j = (width-1)*WIDTH ; j < width*WIDTH; j++){
+            putString(x+i,y+j,"0",15,15);
+
+        }
+
+    }
+    for(i = (length-1)*LENGTH; i< length*LENGTH; i++){
+        for(j = 0 ; j < width*WIDTH; j++){
+            putString(x+i,y+j,"0",15,15);
+
+        }
+
+    }
+}
+
+
+
+Image * read_image(char *pixel_file, char *color_file)
+{
+    FILE *fid1, *fid2;
+    int row, col, i, j;
+    Image *p;
+
+    fid1 = fopen(pixel_file, "r");
+    fid2 = fopen(color_file, "r");
+    if (fid1==NULL || fid2==NULL) {
+        return NULL;
+    } else {
+        fscanf(fid1, "%d%d", &row, &col);
+        fscanf(fid2, "%d%d", &row, &col); // supposedly, size should be the same
+        p = (Image*) malloc(sizeof(Image));
+        p->row = row;
+        p->col = col;
+        p->pixel = (char*) malloc(sizeof(char)*row*col);
+        p->color = (int*) malloc(sizeof(int)*row*col);
+        fscanf(fid1, "%*c");
+        for (i=0; i<row; i++) {
+            for (j=0; j<col; j++) {
+                fscanf(fid1, "%c", & (p->pixel[i*col+j]));
+                fscanf(fid2, "%1x", & (p->color[i*col+j]));
+            }
+            fscanf(fid1, "%*c");
+            fscanf(fid2, "%*c");
+        }
+        fclose(fid1);
+        fclose(fid2);
+        return p;
+    }
+}
+
+char getpixel(Image *ip, int x, int y)
+{
+    return ip->pixel[y*ip->col + x];
+}
+
+int getcolor(Image *ip, int x, int y)
+{
+    return ip->color[y*ip->col + x];
+}
+
+void show_image(Image *ip, int offx, int offy)
+{
+    int x, y;
+
+    char c;
+    for (y=0; y<ip->row; y++) {
+            for (x=0; x<ip->col; x++) {
+            c = getpixel(ip, x, y);
+            if (c!=' ')
+            putASCII2( x + offx,
+                y + offy, c, getcolor(ip, x, y), getcolor(ip, x, y));
+            }
+    }
+}
+void show_image2(Image *ip)
+{
+    int x, y;
+    int offx = ip->xp;
+    int offy = ip->yp;
+    char c;
+    int bgcolor=ip->bg_color;
+    int color = ip->disk_color;
+    for (y=0; y<ip->row; y++) {
+            for (x=0; x<ip->col; x++) {
+            c = '#';
+            if (c!=' ')
+            putASCII2( x + offx,
+                y + offy, c, color, bgcolor);
+            }
+    }
+}
+void destroy_image(Image *ip)
+{
+    free(ip->pixel);
+    free(ip->color);
+    free(ip);
+}
+
+void putStringLarge(Font *fp, int x, int y, char *p, int fg_color, int bg_color)
+{
+    int i;
+    for(i=0; i<strlen(p); i++) {
+        show_font(fp,  p[i], x+i*fp->width, y, fg_color, bg_color);
+    }
+}
+
+
+Font * read_font(char *pixel_file)
+{
+    FILE *fid;
+    int height, width, num, i, j, k;
+    Font *p;
+
+    fid = fopen(pixel_file, "r");
+
+    if (fid==NULL) {
+        return NULL;
+    } else {
+        fscanf(fid, "%d%d%d", &height, &width, &num);
+        p = (Font*) malloc(sizeof(Font));
+        p->height = height;
+        p->width = width;
+        p->pixel = (char*) malloc(sizeof(char)*height*width*num);
+        fscanf(fid, "%*c");
+        for (k=0; k<num; k++) {
+            for (i=0; i<height; i++) {
+                for (j=0; j<width; j++) {
+                    fscanf(fid, "%c", & (p->pixel[k*width*height+i*width+j]));
+                }
+                fscanf(fid, "%*c");
+            }
+        }
+        fclose(fid);
+
+        return p;
+    }
+}
+
+void show_font(Font *ip, char letter, int offx, int offy, int fg_color, int bg_color)
+{
+    int x, y;
+    char c;
+    int shift;
+    if (letter==' ') return;
+    if (isdigit(letter)) {
+        shift = ip->height*(26 + letter-'0');
+    } else {
+        shift = ip->height*(toupper(letter)-'A');
+    }
+    for (y=0; y<ip->height; y++) {
+            for (x=0; x<ip->width; x++) {
+
+            c = getpixel(ip, x, y+shift);
+            if (c!=' ')
+            putASCII2( x + offx,
+                y + offy, '@', fg_color, bg_color);
+            }
+    }
+}
+
+void destroy_font(Font *ip)
+{
+    free(ip->pixel);
+    free(ip);
+}
+
+void putString(int x, int y, char *p, int fg_color, int bg_color)
+{
+    int i;
+    for(i=0; i<strlen(p); i++) {
+        putASCII2(x+i, y, p[i], fg_color, bg_color);
+    }
+}
+
+void move_motion(Image* sp, int final_yp){
+    sp->yp = final_yp;
+}
